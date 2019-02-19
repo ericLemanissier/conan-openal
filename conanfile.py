@@ -35,8 +35,11 @@ class OpenALConan(ConanFile):
         os.rename(extracted_dir, self.source_subfolder)
 
     def build(self):
-        cmake = CMake(self)
-        if self.settings.compiler != 'Visual Studio':
+        generator = None
+        if self.settings.os == 'Windows' and self.settings.compiler == 'gcc':
+            generator = 'MSYS Makefiles'
+        cmake = CMake(self, generator=generator)
+        if self.settings.os != 'Windows':
             cmake.definitions['CMAKE_POSITION_INDEPENDENT_CODE'] = self.options.fPIC
         cmake.definitions['LIBTYPE'] = 'SHARED' if self.options.shared else 'STATIC'
         cmake.definitions['ALSOFT_UTILS'] = False
